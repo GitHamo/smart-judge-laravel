@@ -11,6 +11,7 @@ use Illuminate\Contracts\Container\Container;
 use InvalidArgumentException;
 use Potato\SmartJudge\Application\Judge;
 use Potato\SmartJudge\Domain\Driver;
+use Psr\Log\LoggerInterface;
 
 /**
  * Gives the app a judge per scope, or none when SmartJudge is off or its driver is not configured, so the app falls back.
@@ -43,6 +44,13 @@ final class JudgeFactory
 
         if (null === $driver) {
             return null;
+        }
+
+        // inside the pause, so only a request that reached the driver is logged, not the skips while it is paused
+        if (true === (bool) $this->config->get('smart-judge.log.enabled')) {
+            /** @var LoggerInterface $logger */
+            $logger = $this->container->make('smart-judge.logger');
+            $driver = new LogUnavailable($driver, $logger, $scope);
         }
 
         /** @var CacheRepository $cache */
