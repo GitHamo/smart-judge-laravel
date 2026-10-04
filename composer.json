@@ -1,0 +1,19 @@
+{
+    "name": "potato/smart-judge-laravel",
+    "description": "Laravel bridge for potato/smart-judge: config, container wiring, answer cache and log.",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.3",
+        "illuminate/support": "^11|^12",
+        "potato/smart-judge": "@dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "Potato\\SmartJudge\\Laravel\\": "src/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
