@@ -45,6 +45,9 @@ final class SmartJudgeServiceProvider extends ServiceProvider
             static fn (Container $app): mixed => $app->make('cache')->store(self::nameIn($app, 'smart-judge.cache.store')),
         );
 
+        // the versions of the scopes' answers, in the store the answers are kept in
+        $this->app->bind(ScopeVersions::class, static fn (Container $app): ScopeVersions => new ScopeVersions($app->make('smart-judge.cache')));
+
         $this->app->bind(
             'smart-judge.logger',
             static fn (Container $app): mixed => $app->make('log')->channel(self::nameIn($app, 'smart-judge.log.channel')),
@@ -55,6 +58,7 @@ final class SmartJudgeServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([self::CONFIG => $this->app->configPath('smart-judge.php')], 'smart-judge-config');
+            $this->commands([ClearCommand::class]);
         }
     }
 

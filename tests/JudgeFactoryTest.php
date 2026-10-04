@@ -4,50 +4,18 @@ declare(strict_types=1);
 
 namespace Potato\SmartJudge\Laravel\Tests;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Support\ServiceProvider;
 use InvalidArgumentException;
-use Orchestra\Testbench\TestCase;
-use Override;
 use Potato\SmartJudge\Domain\Driver;
-use Potato\SmartJudge\Domain\Question;
 use Potato\SmartJudge\Domain\Subject;
 use Potato\SmartJudge\Laravel\JudgeFactory;
 use Potato\SmartJudge\Laravel\SmartJudgeServiceProvider;
-use Psr\Http\Message\RequestInterface;
 use Psr\Log\LoggerInterface;
 
-final class JudgeFactoryTest extends TestCase
+final class JudgeFactoryTest extends PackageTestCase
 {
-    private MockHandler $responses;
-
-    /** @var list<array{request: RequestInterface, options: array<string, mixed>}> */
-    private array $history = [];
-
-    #[Override]
-    protected function getPackageProviders($app): array
-    {
-        return [SmartJudgeServiceProvider::class];
-    }
-
-    #[Override]
-    protected function defineEnvironment($app): void
-    {
-        $this->responses = new MockHandler();
-        $stack = HandlerStack::create($this->responses);
-        $stack->push(Middleware::history($this->history));
-
-        $app->instance('smart-judge.http', new Client(['handler' => $stack]));
-
-        $app['config']->set('smart-judge.drivers.typesafe.key', 'secret-key');
-        $app['config']->set('smart-judge.drivers.typesafe.base_url', 'https://jev.example.org/v1');
-    }
-
     public function testMakesAJudgeThatAsksTypeSafeWithTheConfiguredDriver(): void
     {
         config()->set('smart-judge.drivers.typesafe.model', 'jev-2.0.0');
@@ -179,10 +147,5 @@ final class JudgeFactoryTest extends TestCase
         self::assertInstanceOf(Repository::class, $this->app->make('smart-judge.cache'));
         self::assertSame($this->app['cache']->store('array'), $this->app->make('smart-judge.cache'));
         self::assertInstanceOf(LoggerInterface::class, $this->app->make('smart-judge.logger'));
-    }
-
-    private function question(): Question
-    {
-        return new Question('Is `%s` a recurring transaction?', 'A commitment that repeats.', 'One-off spending.');
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Potato\SmartJudge\Laravel;
 
 use Closure;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Container\Container;
 use InvalidArgumentException;
@@ -40,7 +41,15 @@ final class JudgeFactory
         /** @var Driver|null $driver */
         $driver = $this->container->make('smart-judge.driver');
 
-        return null === $driver ? null : new Judge($driver);
+        if (null === $driver) {
+            return null;
+        }
+
+        /** @var CacheRepository $cache */
+        $cache = $this->container->make('smart-judge.cache');
+        $paused = new PauseAfterUnavailable($driver, $cache, $this->seconds('smart-judge.cache.unavailable_ttl'));
+
+        return new Judge(new AnswerCache($paused, $cache, new ScopeVersions($cache), $scope, $this->ttl($scope)));
     }
 
     /**
@@ -71,5 +80,29 @@ final class JudgeFactory
         $config = (array) $this->config->get('smart-judge.drivers.' . $name, []);
 
         return ($this->drivers[$name])($config);
+    }
+
+    /**
+     * Seconds an answer is kept: the scope's own TTL, else the global one.
+     */
+    private function ttl(string $scope): int
+    {
+        $key = 'smart-judge.scopes.' . $scope . '.ttl';
+
+        return null !== $this->config->get($key) ? $this->seconds($key) : $this->seconds('smart-judge.cache.ttl');
+    }
+
+    /**
+     * @throws InvalidArgumentException when the config value is not a number of seconds
+     */
+    private function seconds(string $key): int
+    {
+        $seconds = $this->config->get($key);
+
+        if (!is_numeric($seconds)) {
+            throw new InvalidArgumentException(\sprintf('SmartJudge config "%s" needs a number of seconds.', $key));
+        }
+
+        return (int) $seconds;
     }
 }
