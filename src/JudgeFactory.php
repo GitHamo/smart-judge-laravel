@@ -10,7 +10,6 @@ use Illuminate\Contracts\Container\Container;
 use InvalidArgumentException;
 use Potato\SmartJudge\Application\Judge;
 use Potato\SmartJudge\Domain\Driver;
-use Potato\SmartJudge\Infrastructure\Drivers\TypeSafe;
 
 /**
  * Gives the app a judge per scope, or none when SmartJudge is off or its driver is not configured, so the app falls back.
@@ -18,19 +17,18 @@ use Potato\SmartJudge\Infrastructure\Drivers\TypeSafe;
 final class JudgeFactory
 {
     /** @var array<string, Closure(array<string, mixed>): ?Driver> */
-    private array $drivers;
+    private array $drivers = [];
 
     public function __construct(
         private readonly Container $container,
         private readonly Repository $config,
     ) {
-        $this->drivers = [
-            'typesafe' => fn (array $config): ?Driver => $this->typeSafe($config),
-        ];
     }
 
     /**
      * @param string $scope the feature that asks, e.g. `recurring`
+     *
+     * @throws InvalidArgumentException when the selected driver is not registered or its config is invalid
      */
     public function make(string $scope): ?Judge
     {
@@ -38,6 +36,7 @@ final class JudgeFactory
             return null;
         }
 
+        // through the container, so the app can replace the driver by binding `smart-judge.driver`
         /** @var Driver|null $driver */
         $driver = $this->container->make('smart-judge.driver');
 
@@ -56,9 +55,9 @@ final class JudgeFactory
     }
 
     /**
-     * The driver config selects, or null when it is not configured.
+     * The driver config selects, or null when it is not configured; what `smart-judge.driver` resolves to unless the app replaces it.
      *
-     * @throws InvalidArgumentException when no driver is registered by the selected name
+     * @throws InvalidArgumentException when no driver is registered by the selected name, or its config is invalid
      */
     public function driver(): ?Driver
     {
@@ -72,27 +71,5 @@ final class JudgeFactory
         $config = (array) $this->config->get('smart-judge.drivers.' . $name, []);
 
         return ($this->drivers[$name])($config);
-    }
-
-    /**
-     * @param array<string, mixed> $config
-     */
-    private function typeSafe(array $config): ?TypeSafe
-    {
-        $key = $config['key'] ?? null;
-
-        if (!\is_string($key) || '' === $key) {
-            return null;
-        }
-
-        $model = $config['model'] ?? null;
-        $baseUrl = $config['base_url'] ?? null;
-        $timeout = $config['timeout'] ?? null;
-
-        if (!\is_string($model) || !\is_string($baseUrl) || !is_numeric($timeout)) {
-            throw new InvalidArgumentException('SmartJudge driver "typesafe" needs a model, a base_url and a timeout.');
-        }
-
-        return new TypeSafe($key, $model, $baseUrl, $this->container->make('smart-judge.http'), (float) $timeout);
     }
 }
