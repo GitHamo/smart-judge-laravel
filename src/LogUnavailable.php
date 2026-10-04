@@ -11,7 +11,7 @@ use Potato\SmartJudge\Domain\JudgeUnavailable;
 use Psr\Log\LoggerInterface;
 
 /**
- * Warns once per request a driver could not answer, so an operator sees each outage and why; answers are not logged.
+ * Warns each time a request to the driver finds it unavailable, so an operator sees why; answers are not logged.
  */
 final readonly class LogUnavailable implements Driver
 {

@@ -185,13 +185,6 @@ final class CacheTest extends PackageTestCase
         self::assertCount(2, $this->history);
     }
 
-    private function answer(float $probability): void
-    {
-        $this->responses->append(new Response(200, [], json_encode([
-            'answers' => ['transaction_3' => ['type' => 'noul', 'noul' => $probability]],
-        ], JSON_THROW_ON_ERROR)));
-    }
-
     /**
      * @param array<string, mixed> $facts
      *

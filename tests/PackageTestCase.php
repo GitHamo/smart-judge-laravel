@@ -8,6 +8,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Response;
 use Orchestra\Testbench\TestCase;
 use Override;
 use Potato\SmartJudge\Domain\Question;
@@ -41,6 +42,16 @@ abstract class PackageTestCase extends TestCase
 
         $app['config']->set('smart-judge.drivers.typesafe.key', 'secret-key');
         $app['config']->set('smart-judge.drivers.typesafe.base_url', 'https://jev.example.org/v1');
+    }
+
+    /**
+     * Stubs TypeSafe's next answer about subject 3, a `transaction`.
+     */
+    protected function answer(float $probability): void
+    {
+        $this->responses->append(new Response(200, [], json_encode([
+            'answers' => ['transaction_3' => ['type' => 'noul', 'noul' => $probability]],
+        ], JSON_THROW_ON_ERROR)));
     }
 
     protected function question(): Question
