@@ -1,6 +1,6 @@
 # SmartJudge for Laravel
 
-Laravel bridge for `potato/smart-judge`: config, container wiring, an answer cache, a pause after a failure, and a log of outages. Supports Laravel 11 and 12.
+Laravel bridge for `potato/smart-judge`: config, container wiring, an answer cache, a pause after a driver was unavailable, and a log of outages. Supports Laravel 11 and 12.
 
 ## Install
 
@@ -48,7 +48,7 @@ $this->app->bind(SubscriptionJudge::class, function (): SubscriptionJudge {
 
 - caches answers per scope, keyed by the driver and the request, so the same question is not paid for twice;
 - after a driver was unavailable, throws `JudgeUnavailable` without asking for `cache.unavailable_ttl` seconds, in every scope, so an outage costs one slow request;
-- logs one warning per outage with the driver, the HTTP status, the reason and the scope. Cache hits, skips and answers are not logged.
+- logs one warning per outage with the driver, the HTTP status, the reason and the scope. Cache hits, skips and successful requests are not logged.
 
 Clear the cached answers of one scope, or of every scope, e.g. after changing a question. It works on every cache store:
 

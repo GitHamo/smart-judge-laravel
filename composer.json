@@ -13,6 +13,8 @@
         "psr/log": "^3"
     },
     "require-dev": {
+        "guzzlehttp/psr7": "^2",
+        "illuminate/log": "^11|^12",
         "orchestra/testbench": "^9|^10",
         "phpunit/phpunit": "^11.5"
     },
