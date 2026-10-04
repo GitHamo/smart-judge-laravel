@@ -121,7 +121,7 @@ final class JudgeFactoryTest extends PackageTestCase
         self::assertTrue(config('smart-judge.enabled'));
         self::assertSame('typesafe', config('smart-judge.driver'));
         self::assertSame('jev-1.13.0', config('smart-judge.drivers.typesafe.model'));
-        self::assertSame(5, config('smart-judge.drivers.typesafe.timeout'));
+        self::assertSame(5.0, config('smart-judge.drivers.typesafe.timeout'));
         self::assertNull(config('smart-judge.cache.store'));
         self::assertSame(6 * 60 * 60, config('smart-judge.cache.ttl'));
         self::assertSame(60, config('smart-judge.cache.unavailable_ttl'));

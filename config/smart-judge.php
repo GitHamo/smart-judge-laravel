@@ -20,7 +20,7 @@ return [
             'key' => env('TYPESAFE_API_KEY'),
             'model' => env('TYPESAFE_MODEL', 'jev-1.13.0'),
             'base_url' => env('TYPESAFE_BASE_URL', 'https://api.typesafe.ai/v1'),
-            'timeout' => (int) env('TYPESAFE_TIMEOUT', 5),
+            'timeout' => (float) env('TYPESAFE_TIMEOUT', 5),
         ],
     ],
 
