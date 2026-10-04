@@ -40,6 +40,9 @@ abstract class PackageTestCase extends TestCase
 
         $app->instance('smart-judge.http', new Client(['handler' => $stack]));
 
+        // not left to env, which a consuming app's test run may have set, e.g. SMART_JUDGE_ENABLED=false
+        $app['config']->set('smart-judge.enabled', true);
+        $app['config']->set('smart-judge.log.enabled', true);
         $app['config']->set('smart-judge.drivers.typesafe.key', 'secret-key');
         $app['config']->set('smart-judge.drivers.typesafe.base_url', 'https://jev.example.org/v1');
     }
