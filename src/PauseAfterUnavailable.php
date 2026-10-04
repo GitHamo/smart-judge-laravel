@@ -11,7 +11,7 @@ use Potato\SmartJudge\Domain\Driver;
 use Potato\SmartJudge\Domain\JudgeUnavailable;
 
 /**
- * Stops asking a driver for a while after it was unavailable, in every scope, so an outage costs one slow request.
+ * Stops asking a driver for a while after it was unavailable, in every scope, so an unavailable driver costs one slow request.
  */
 final readonly class PauseAfterUnavailable implements Driver
 {

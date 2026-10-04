@@ -49,7 +49,10 @@ final class JudgeFactory
         $cache = $this->container->make('smart-judge.cache');
         $paused = new PauseAfterUnavailable($driver, $cache, $this->seconds('smart-judge.cache.unavailable_ttl'));
 
-        return new Judge(new AnswerCache($paused, $cache, new ScopeVersions($cache), $scope, $this->ttl($scope)));
+        /** @var ScopeVersions $versions */
+        $versions = $this->container->make(ScopeVersions::class);
+
+        return new Judge(new AnswerCache($paused, $cache, $versions, $scope, $this->ttl($scope)));
     }
 
     /**

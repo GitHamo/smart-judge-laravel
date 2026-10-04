@@ -31,7 +31,7 @@ final readonly class ScopeVersions
     /**
      * @param string|null $scope null clears every scope
      */
-    public function clear(?string $scope = null): void
+    public function clear(?string $scope): void
     {
         $key = null === $scope ? self::ALL : self::key($scope);
 
@@ -43,7 +43,8 @@ final readonly class ScopeVersions
     {
         $count = $this->cache->get($key);
 
-        return \is_int($count) ? $count : 0;
+        // numeric, not int: stores such as Redis keep numbers unserialized and give them back as strings
+        return is_numeric($count) ? (int) $count : 0;
     }
 
     private static function key(string $scope): string

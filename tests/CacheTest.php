@@ -11,7 +11,7 @@ use Potato\SmartJudge\Domain\JudgeUnavailable;
 use Potato\SmartJudge\Domain\Subject;
 use Potato\SmartJudge\Laravel\JudgeFactory;
 
-final class AnswerCacheTest extends PackageTestCase
+final class CacheTest extends PackageTestCase
 {
     #[Override]
     protected function defineEnvironment($app): void

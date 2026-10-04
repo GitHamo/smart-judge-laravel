@@ -8,6 +8,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Override;
 use Potato\SmartJudge\Domain\Context;
 use Potato\SmartJudge\Domain\Driver;
+use Potato\SmartJudge\Domain\Question;
 
 /**
  * Keeps a driver's answers per scope, so the same request is not paid for twice.
@@ -53,7 +54,7 @@ final readonly class AnswerCache implements Driver
      * The driver's name is in the hash, so a model change never serves the answers of the model before.
      *
      * @param array<string, array<string, mixed>> $facts
-     * @param array<string, \Potato\SmartJudge\Domain\Question> $questions
+     * @param array<string, Question> $questions
      */
     private function key(array $facts, array $questions, ?Context $context): string
     {
