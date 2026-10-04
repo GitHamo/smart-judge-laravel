@@ -7,7 +7,7 @@ return [
     /*
     | Off means no data leaves the server: JudgeFactory::make() gives no judge, so the app falls back.
     */
-    'enabled' => (bool) env('SMART_JUDGE_ENABLED', true),
+    'enabled' => filter_var(env('SMART_JUDGE_ENABLED', true), FILTER_VALIDATE_BOOL),
 
     /*
     | The driver that answers, one of `drivers` below or one registered with JudgeFactory::extend().
@@ -39,7 +39,7 @@ return [
     'scopes' => [],
 
     'log' => [
-        'enabled' => (bool) env('SMART_JUDGE_LOG_ENABLED', true),
+        'enabled' => filter_var(env('SMART_JUDGE_LOG_ENABLED', true), FILTER_VALIDATE_BOOL),
         // null means the app's default channel
         'channel' => env('SMART_JUDGE_LOG_CHANNEL'),
     ],
